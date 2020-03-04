@@ -9,7 +9,7 @@ public class MainMenuManager : MonoBehaviour
     {
         // loads next scene
         // this would actually be after choosing the level etc
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene("Game Scene");
     }
 
     public void QuitGame()

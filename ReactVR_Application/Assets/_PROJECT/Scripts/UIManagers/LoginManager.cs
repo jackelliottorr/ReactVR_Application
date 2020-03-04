@@ -22,7 +22,42 @@ public class LoginManager : MonoBehaviour
 
     #endregion
 
+
     #region Public Methods
+
+    /// <summary>
+    /// If the user has already logged in and their current access token is still valid,
+    /// load the next scene so that they don't have to re-enter their password
+    /// </summary>
+    private void Awake()
+    {
+        TokenManager tokenManager = new TokenManager();
+        var accessToken = tokenManager.RetrieveToken();
+
+        try
+        {
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+                var jsonResponse = httpClient.PostAsync(new Uri("http://localhost:7071/api/UserAccount/ValidateAccessToken"), null).Result;
+
+                if (jsonResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = jsonResponse.Content.ReadAsStringAsync();
+                    string updatedAccessToken = responseContent.Result;
+
+                    tokenManager.StoreToken(updatedAccessToken);
+
+                    SceneManager.LoadSceneAsync("Main Menu Scene", LoadSceneMode.Single);
+                }
+            }
+        }        
+        catch (Exception ex)
+        {
+            var message = ex.Message;
+            throw ex;
+        }
+    }
 
     private UserAccountCreateModel BuildLoginModel()
     {
