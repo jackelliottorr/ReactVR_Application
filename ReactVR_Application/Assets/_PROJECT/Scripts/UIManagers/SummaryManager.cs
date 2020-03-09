@@ -33,7 +33,7 @@ namespace Assets._PROJECT.Scripts.UIManagers
         [SerializeField] private GameObject ScoreDisplay;
         
         [Tooltip("Scene to change to when player hits 'Continue'.")]
-        [SerializeField] private SceneAsset MenuScene;
+        [SerializeField] private Scene MenuScene;
 
         public void UpdateValues(int hitCount, int missCount, int score)
         {

@@ -6,6 +6,7 @@ using System.Net.Http;
 using Assets._PROJECT.Scripts.HelperClasses;
 using Newtonsoft.Json;
 using ReactVR_API.Common.Models;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VRUiKits.Utils;
@@ -22,6 +23,12 @@ public class MainMenuManager : MonoBehaviour
     [Tooltip("The GameObject containing the CardListManager script.")]
     [SerializeField] private GameObject LevelCardList;
 
+    [Header("Demo Scenes")]
+    [Tooltip("The Demo Scene.")]
+    [SerializeField] private Scene DemoScene;
+    [Tooltip("The 360 degree Demo Scene.")]
+    [SerializeField] private Scene DemoScene360;
+
     void Start()
     {
     }
@@ -31,6 +38,22 @@ public class MainMenuManager : MonoBehaviour
         // loads next scene
         // this would actually be after choosing the level etc
         SceneManager.LoadScene("Game Scene");
+    }
+
+    public void PlayDemo()
+    {
+        if (SessionData.DemoMode)
+        {
+            SceneManager.LoadScene("Demo Scene");
+        }
+    }
+
+    public void Play360Demo()
+    {
+        if (SessionData.DemoMode)
+        {
+            SceneManager.LoadScene("360 Demo Scene");
+        }
     }
 
     public void QuitGame()
@@ -179,8 +202,6 @@ public class MainMenuManager : MonoBehaviour
 
     private void LoadLevel(Card card)
     {
-        Debug.Log("Loading level");
-
         try
         {
             LevelConfigurationViewModel levelConfigToLoad = _levelConfigurationViewModels.FirstOrDefault(l => l.LevelConfigurationId == card.Id);
@@ -195,11 +216,10 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-
     // move all these methods to a seperate class probably for api calls
-    private List<ReactVR_API.Common.Models.Target> GetTargets(Guid levelConfigurationId)
+    private List<Target> GetTargets(Guid levelConfigurationId)
     {
-        List<ReactVR_API.Common.Models.Target> targets = new List<ReactVR_API.Common.Models.Target>();
+        List<Target> targets = new List<Target>();
 
         return targets;
     }
@@ -210,4 +230,5 @@ public class MainMenuManager : MonoBehaviour
 
         return targetZone;
     }
+
 }

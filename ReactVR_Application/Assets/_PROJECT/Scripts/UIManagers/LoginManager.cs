@@ -134,5 +134,12 @@ public class LoginManager : MonoBehaviour
         }
     }
 
+    public void PlayOffline()
+    {
+        SessionData.DemoMode = true;
+
+        SceneManager.LoadSceneAsync("Main Menu Scene", LoadSceneMode.Single);
+    }
+
     #endregion
 }

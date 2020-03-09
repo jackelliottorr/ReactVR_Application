@@ -10,5 +10,7 @@ namespace Assets._PROJECT.Scripts.HelperClasses
     public static class SessionData
     {
         public static LevelConfigurationViewModel LevelConfigurationViewModel { get; set; }
+
+        public static bool DemoMode = false;
     }
 }
