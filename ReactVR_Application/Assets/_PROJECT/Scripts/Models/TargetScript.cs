@@ -3,15 +3,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Target : MonoBehaviour
+public class TargetScript : MonoBehaviour
 {
     private bool _active = false;
     private bool _hit = false;
 
+    [Header("User Defined")]
+    [Tooltip("Sound Effect to play on hit.")]
+    [SerializeField] private AudioClip HitSoundEffect;
+
+    [Tooltip("Sound Effect to play on activation.")]
+    [SerializeField] private AudioClip ActivationSoundEffect;
+
     public bool Activated
     {
-        get => _active; 
-        set => _active = value;
+        get
+        {
+            return _active;
+        }
+        set
+        {
+            if (ActivationSoundEffect != null)
+            {
+                AudioSource.PlayClipAtPoint(ActivationSoundEffect, this.transform.position);
+            }
+
+            _active = value;
+        }
     }
 
     public bool Hit
@@ -20,7 +38,7 @@ public class Target : MonoBehaviour
         set => _hit = value;
     }
 
-    public Target()
+    public TargetScript()
     {
 
     }
@@ -74,6 +92,11 @@ public class Target : MonoBehaviour
 
     private IEnumerator ControllerCollision(OVRInput.Controller controller)
     {
+        if (HitSoundEffect != null)
+        {
+            AudioSource.PlayClipAtPoint(HitSoundEffect, this.transform.position);
+        }
+
         _active = false;
         _hit = true;
 

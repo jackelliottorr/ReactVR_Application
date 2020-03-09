@@ -85,7 +85,6 @@ public class LoginManager : MonoBehaviour
 
             using (var httpClient = new HttpClient())
             {
-                //httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
                 var jsonResponse = httpClient.PostAsync(new Uri(url), content).Result;
 
                 if (jsonResponse.IsSuccessStatusCode)

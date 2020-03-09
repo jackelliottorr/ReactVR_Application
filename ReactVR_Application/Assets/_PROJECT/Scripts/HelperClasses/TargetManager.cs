@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Assets._PROJECT.Scripts.HelperClasses;
+using Assets._PROJECT.Scripts.UIManagers;
+using ReactVR_API.Common.Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,29 +15,39 @@ public class TargetManager : MonoBehaviour
     private int _missCount = 0;
     private int _score = 0;
     private float _targetUptime = 0f;
-    private float _timeLeft = 60.0f;
+    private float _timeLeft = 10.0f;
 
     // fields to update the GUI so user can see time left
     private TextMeshProUGUI _timerDisplay;
     private TextMeshProUGUI _scoreDisplay;
 
     //private List<Target> Targets = new List<Target>();
+    private List<TargetAppearance> _targetAppearances = new List<TargetAppearance>();
     private List<GameObject> _targetGameObjects = new List<GameObject>();
     private GameObject _activeTarget = null;
     
-    [Header("User defined")]
-    [Tooltip("TextMeshPro UI that will show the player the time left.")]
-    public GameObject TimerDisplay;
+    [Header("GUI Display")]
+    [Tooltip("GameObject with TextMeshProUGUI that will show the player the time left.")]
+    [SerializeField] private GameObject TimerDisplay;
+    [Tooltip("GameObject with TextMeshProUGUI that will show the player their score.")]
+    [SerializeField] private GameObject ScoreDisplay;
+    [Tooltip("Canvas that will be activated and shown to the user when the level ends.")]
+    [SerializeField] private GameObject SummaryCanvas;
+    [Tooltip("Particle System to emit from the targets.")]
+    [SerializeField] private ParticleSystem TargetParticleSystem;
+    [Tooltip("Burst to emit from the targets.")]
+    [SerializeField] private ParticleSystem TargetParticleSystemBurst;
 
-    [Tooltip("TextMeshPro UI that will show the player their score.")]
-    public GameObject ScoreDisplay;
-
-    public Material InactiveMaterial;
-    public Material ActiveMaterial;
-    public Material MissMaterial;
+    [Header("Materials")]
+    [SerializeField] private Material InactiveMaterial;
+    [SerializeField] private Material ActiveMaterial;
+    [SerializeField] private Material MissMaterial;
 
     void Start()
     {
+        // Turn off renderer for play surface
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+
         // Get timer text GameObject
         _timerDisplay = TimerDisplay.GetComponent<TextMeshProUGUI>();
         _scoreDisplay = ScoreDisplay.GetComponent<TextMeshProUGUI>();
@@ -45,20 +57,18 @@ public class TargetManager : MonoBehaviour
             if (child.tag == "Target")
             {
                 _targetGameObjects.Add(child.gameObject);
+                //child.gameObject.active = false;
             }
 
         }
 
         Debug.Log($"{_targetGameObjects.Count} targets found.");
 
-        foreach (GameObject target in _targetGameObjects)
-        {
-            Renderer renderer = target.GetComponent<Renderer>();
-            renderer.material = InactiveMaterial;
-        }
-
-        // Start the target stuff
-        //StartCoroutine(RunGame());
+        //foreach (GameObject target in _targetGameObjects)
+        //{
+        //    Renderer renderer = target.GetComponent<Renderer>();
+        //    renderer.material = InactiveMaterial;
+        //}
     }
 
     // Update is called once per frame
@@ -69,20 +79,24 @@ public class TargetManager : MonoBehaviour
 
         if (_timeLeft <= 0)
         {
-            SceneManager.LoadScene("Main Menu Scene");
+            EndLevel();
         }
 
         // check if there is already an active target
         if (_activeTarget != null)
         {
             _targetUptime += Time.deltaTime;
-            var activeTargetScript = _activeTarget.GetComponent<Target>();
+            var activeTargetScript = _activeTarget.GetComponent<TargetScript>();
 
             bool activeTargetFinished = false;
 
             // if it has been hit then update the counters and display, then continue
             if (activeTargetScript.Hit)
             {
+                TargetParticleSystemBurst.transform.position = _activeTarget.transform.position;
+                TargetParticleSystemBurst.gameObject.SetActive(true);
+                TargetParticleSystemBurst.Play();
+
                 _hitCount++;
                 _score++;
                 _scoreDisplay.text = $"Score: {_score}";
@@ -112,14 +126,19 @@ public class TargetManager : MonoBehaviour
                 activeTargetScript.Activated = false;
 
                 _targetUptime = 0;
+                //_activeTarget.active = false;
                 _activeTarget = null;
+
+                // Stop & Hide the ParticleSystem at the position of the Target
+                //TargetParticleSystem.gameObject.SetActive(false);
+                //TargetParticleSystem.Stop();
             }
         }
         else
         {
             // no active target, pick one
             var target = _targetGameObjects.PickRandom();
-            var targetScript = target.GetComponent<Target>();
+            var targetScript = target.GetComponent<TargetScript>();
 
             // show the user that the target is active
             Renderer renderer = target.GetComponent<Renderer>();
@@ -129,12 +148,27 @@ public class TargetManager : MonoBehaviour
 
             _targetUptime = 0;
             _activeTarget = target;
+            //_activeTarget.active = true;
+
+            // Play the ParticleSystem at the position of the Target
+            TargetParticleSystem.transform.position = target.transform.position;
+            TargetParticleSystem.gameObject.SetActive(true);
+            TargetParticleSystem.Play();
         }
     }    
 
     private void EndLevel()
     {
-        SceneManager.LoadScene("Main Menu Scene");
+        TargetParticleSystem.Stop();
+        TargetParticleSystem.gameObject.SetActive(false);
+
+        SummaryManager summaryManager = SummaryCanvas.GetComponent<SummaryManager>();
+        summaryManager.UpdateValues(_hitCount, _missCount, _score);
+
+        SummaryCanvas.SetActive(true);
+
+        // Disable this gameObject
+        gameObject.SetActive(false);
     }
 
     private IEnumerator RunGame()
@@ -143,7 +177,7 @@ public class TargetManager : MonoBehaviour
         {        
             // randomly pick the next target
             var target = _targetGameObjects.PickRandom();
-            var targetScript = target.GetComponent<Target>();
+            var targetScript = target.GetComponent<TargetScript>();
 
             // show the user that the target is active
             Renderer renderer = target.GetComponent<Renderer>();

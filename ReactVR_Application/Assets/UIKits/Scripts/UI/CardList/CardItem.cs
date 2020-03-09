@@ -10,6 +10,7 @@ namespace VRUiKits.Utils
     [Serializable]
     public class Card
     {
+        public Guid Id;
         public string title;
         public string subtitle;
         public string description;

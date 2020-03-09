@@ -10,7 +10,7 @@ namespace VRUiKits.Utils
         public GameObject itemTemplate;
         [HideInInspector]
         public List<Card> cardList = new List<Card>(); // Used for data population;
-        List<CardItem> cardItems = new List<CardItem>();
+        public List<CardItem> cardItems = new List<CardItem>();
         [HideInInspector]
         public Card selectedCard;
 
