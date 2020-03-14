@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Assets._PROJECT.Scripts.HelperClasses;
 using Newtonsoft.Json;
 using ReactVR_API.Common.Models;
@@ -62,7 +63,7 @@ public class MainMenuManager : MonoBehaviour
         Application.Quit();
     }
 
-    public void GetAllLevels()
+    public async void GetAllLevels()
     {
         TokenManager tokenManager = new TokenManager();
         var accessToken = tokenManager.RetrieveToken();
@@ -72,12 +73,12 @@ public class MainMenuManager : MonoBehaviour
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                var jsonResponse = httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels")).Result;
+                var jsonResponse = await httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels"));
 
                 if (jsonResponse.IsSuccessStatusCode)
                 {
-                    var responseContent = jsonResponse.Content.ReadAsStringAsync();
-                    var jsonString = responseContent.Result;
+                    var responseContent = await jsonResponse.Content.ReadAsStringAsync();
+                    var jsonString = responseContent;
 
                     List<Level> levels = JsonConvert.DeserializeObject<List<Level>>(jsonString);
 
@@ -127,7 +128,7 @@ public class MainMenuManager : MonoBehaviour
     /// Now, set the OnClicked event to load the level instead.
     /// </summary>
     /// <param name="card"></param>
-    private void PopulateLevelConfigurations(Card card)
+    private async void PopulateLevelConfigurations(Card card)
     {
         // Clear out the CardListManager's cards
         cardListManager = LevelCardList.GetComponent<CardListManager>();
@@ -137,7 +138,7 @@ public class MainMenuManager : MonoBehaviour
         // Create Cards for LevelConfigurations retrieved from the API
         // keep in mind, we could create our own versions of the Card/CardItem classes, so that they have they the
         // level information as well. Instead of storing in this class and finding by Id (which we've added anyway).
-        List<LevelConfigurationViewModel> levelConfigurations = GetLevelConfigurations(card.Id);
+        List<LevelConfigurationViewModel> levelConfigurations = await GetLevelConfigurations(card.Id);
         foreach (LevelConfigurationViewModel levelConfiguration in levelConfigurations)
         {
             _levelConfigurationViewModels.Add(levelConfiguration);
@@ -168,7 +169,7 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     /// <param name="levelId"></param>
     /// <returns></returns>
-    private List<LevelConfigurationViewModel> GetLevelConfigurations(Guid levelId)
+    private async Task<List<LevelConfigurationViewModel>> GetLevelConfigurations(Guid levelId)
     {
         List<LevelConfigurationViewModel> levelConfigurations = new List<LevelConfigurationViewModel>();
         
@@ -180,12 +181,12 @@ public class MainMenuManager : MonoBehaviour
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                var jsonResponse = httpClient.GetAsync(new Uri($"http://localhost:7071/api/LevelConfiguration/{levelId}")).Result;
+                var jsonResponse = await httpClient.GetAsync(new Uri($"http://localhost:7071/api/LevelConfiguration/{levelId}"));
 
                 if (jsonResponse.IsSuccessStatusCode)
                 {
-                    var responseContent = jsonResponse.Content.ReadAsStringAsync();
-                    var jsonString = responseContent.Result;
+                    var responseContent = await jsonResponse.Content.ReadAsStringAsync();
+                    var jsonString = responseContent;
 
                     levelConfigurations = JsonConvert.DeserializeObject<List<LevelConfigurationViewModel>>(jsonString);
                 }
