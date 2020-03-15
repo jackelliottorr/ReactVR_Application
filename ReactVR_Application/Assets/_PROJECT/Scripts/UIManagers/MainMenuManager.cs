@@ -23,6 +23,8 @@ public class MainMenuManager : MonoBehaviour
     [Header("User Defined")]
     [Tooltip("The GameObject containing the CardListManager script.")]
     [SerializeField] private GameObject LevelCardList;
+    [Tooltip("The GameObject to display when asynchronous tasks are occurring.")]
+    [SerializeField] private GameObject LoadingObject;
 
     [Header("Demo Scenes")]
     [Tooltip("The Demo Scene.")]
@@ -73,16 +75,25 @@ public class MainMenuManager : MonoBehaviour
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                var jsonResponse = await httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels"));
+
+                Task<HttpResponseMessage> levelsTask = httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels"));
+
+                // show loading animation
+                LoadingObject.SetActive(true);
+
+                HttpResponseMessage jsonResponse = await levelsTask;
 
                 if (jsonResponse.IsSuccessStatusCode)
                 {
-                    var responseContent = await jsonResponse.Content.ReadAsStringAsync();
-                    var jsonString = responseContent;
-
+                    Task<string> readAsStringTask = jsonResponse.Content.ReadAsStringAsync();
+                    string jsonString = await readAsStringTask;
+                    
                     List<Level> levels = JsonConvert.DeserializeObject<List<Level>>(jsonString);
 
                     PopulateLevels(levels);
+
+                    // don't show loading animation anymore
+                    LoadingObject.SetActive(false);
                 }
             }
         }
@@ -181,7 +192,13 @@ public class MainMenuManager : MonoBehaviour
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                var jsonResponse = await httpClient.GetAsync(new Uri($"http://localhost:7071/api/LevelConfiguration/{levelId}"));
+
+                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri($"http://localhost:7071/api/LevelConfiguration/{levelId}")); 
+
+                // show loading animation
+                LoadingObject.SetActive(true);
+
+                HttpResponseMessage jsonResponse = await levelConfigurationsTask;
 
                 if (jsonResponse.IsSuccessStatusCode)
                 {
@@ -190,6 +207,9 @@ public class MainMenuManager : MonoBehaviour
 
                     levelConfigurations = JsonConvert.DeserializeObject<List<LevelConfigurationViewModel>>(jsonString);
                 }
+
+                // show loading animation
+                LoadingObject.SetActive(false);
 
                 return levelConfigurations;
             }
