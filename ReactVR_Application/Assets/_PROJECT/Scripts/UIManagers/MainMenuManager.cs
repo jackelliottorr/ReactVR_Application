@@ -23,7 +23,9 @@ public class MainMenuManager : MonoBehaviour
     [Header("User Defined")]
     [Tooltip("The GameObject containing the CardListManager script.")]
     [SerializeField] private GameObject LevelCardList;
-    [Tooltip("The GameObject to display when asynchronous tasks are occurring.")]
+    [Tooltip("The GameObject for the Leaderboard.")]
+    [SerializeField] private GameObject VerticalCardList;
+    [Tooltip("The GameObject to display when asynchronous tasks are processing.")]
     [SerializeField] private GameObject LoadingObject;
 
     [Header("Demo Scenes")]
@@ -65,50 +67,21 @@ public class MainMenuManager : MonoBehaviour
         Application.Quit();
     }
 
-    public async void GetAllLevels()
+    private void PopulateCardList(List<Card> cards, CardListManager cardListManager)
     {
-        TokenManager tokenManager = new TokenManager();
-        var accessToken = tokenManager.RetrieveToken();
-
-        try
-        {
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-
-                Task<HttpResponseMessage> levelsTask = httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels"));
-
-                // show loading animation
-                LoadingObject.SetActive(true);
-
-                HttpResponseMessage jsonResponse = await levelsTask;
-
-                if (jsonResponse.IsSuccessStatusCode)
-                {
-                    Task<string> readAsStringTask = jsonResponse.Content.ReadAsStringAsync();
-                    string jsonString = await readAsStringTask;
-                    
-                    List<Level> levels = JsonConvert.DeserializeObject<List<Level>>(jsonString);
-
-                    PopulateLevels(levels);
-
-                    // don't show loading animation anymore
-                    LoadingObject.SetActive(false);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            var message = ex.Message;
-            throw ex;
-        }
-    }
-
-    private void PopulateLevels(List<Level> levels)
-    {
-        cardListManager = LevelCardList.GetComponent<CardListManager>();
         cardListManager.Reset();
         cardListManager.cardList.Clear();
+
+        cards.ForEach(c => cardListManager.cardList.Add(c));
+
+        // PopulateList will draw the UI element in the cardlist.
+        cardListManager.PopulateList();
+    }
+
+    public async void PopulateLevels()
+    {
+        List<Level> levels = await GetLevelsAsync();
+        List<Card> cards = new List<Card>();
 
         foreach (Level level in levels)
         {
@@ -121,16 +94,16 @@ public class MainMenuManager : MonoBehaviour
                 //image = 
             };
 
-            cardListManager.cardList.Add(newCard);
+            cards.Add(newCard);
         }
 
-        // PopulateList will draw the UI element in the cardlist.
-        cardListManager.PopulateList();
+        cardListManager = LevelCardList.GetComponent<CardListManager>();
+        PopulateCardList(cards, cardListManager);
 
         foreach (CardItem item in cardListManager.cardItems)
         {
             item.OnCardClicked += PopulateLevelConfigurations;
-        }
+        } 
     }
 
     /// <summary>
@@ -141,15 +114,9 @@ public class MainMenuManager : MonoBehaviour
     /// <param name="card"></param>
     private async void PopulateLevelConfigurations(Card card)
     {
-        // Clear out the CardListManager's cards
-        cardListManager = LevelCardList.GetComponent<CardListManager>();
-        cardListManager.Reset();
-        cardListManager.cardList.Clear();
+        List<LevelConfigurationViewModel> levelConfigurations = await GetLevelConfigurationsAsync(card.Id);
+        List<Card> cards = new List<Card>();
 
-        // Create Cards for LevelConfigurations retrieved from the API
-        // keep in mind, we could create our own versions of the Card/CardItem classes, so that they have they the
-        // level information as well. Instead of storing in this class and finding by Id (which we've added anyway).
-        List<LevelConfigurationViewModel> levelConfigurations = await GetLevelConfigurations(card.Id);
         foreach (LevelConfigurationViewModel levelConfiguration in levelConfigurations)
         {
             _levelConfigurationViewModels.Add(levelConfiguration);
@@ -163,15 +130,77 @@ public class MainMenuManager : MonoBehaviour
                 //image = 
             };
 
-            cardListManager.cardList.Add(newCard);
+            cards.Add(newCard);
         }
 
-        // PopulateList will draw the UI element in the cardlist.
-        cardListManager.PopulateList();
+        cardListManager = LevelCardList.GetComponent<CardListManager>();
+        PopulateCardList(cards, cardListManager);
 
         foreach (CardItem item in cardListManager.cardItems)
         {
             item.OnCardClicked += LoadLevel;
+        }
+
+        //foreach (CardItem item in cardListManager.cardItems)
+        //{
+        //    item.OnCardClicked += PopulateScoreboard;
+        //}
+    }
+
+    private async void PopulateScoreboard(Card card)
+    {
+        List<Scoreboard> scores = await GetScoresAsync(card.Id);
+        List<Card> cards = new List<Card>();
+
+        foreach (Scoreboard score in scores)
+        {
+            Card newCard = new Card()
+            {
+                Id = score.ScoreboardId,
+                title = "Title",
+                description = "Description",
+                subtitle = "Subtitle"
+            };
+
+            cards.Add(newCard);
+        }
+
+        cardListManager = VerticalCardList.GetComponent<CardListManager>();
+        PopulateCardList(cards, cardListManager);
+    }
+
+    private async Task<List<Level>> GetLevelsAsync()
+    {
+        try
+        {
+            TokenManager tokenManager = new TokenManager();
+            var accessToken = tokenManager.RetrieveToken();
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+
+                Task<HttpResponseMessage> levelsTask = httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels"));
+                LoadingObject.SetActive(true);
+                HttpResponseMessage jsonResponse = await levelsTask;
+
+                List<Level> levels = new List<Level>();
+
+                if (jsonResponse.IsSuccessStatusCode)
+                {
+                    Task<string> readAsStringTask = jsonResponse.Content.ReadAsStringAsync();
+                    string jsonString = await readAsStringTask;
+
+                    levels = JsonConvert.DeserializeObject<List<Level>>(jsonString);
+                }
+
+                return levels;
+            }
+        }
+        catch (Exception ex)
+        {
+            var message = ex.Message;
+            throw ex;
         }
     }
 
@@ -180,7 +209,7 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     /// <param name="levelId"></param>
     /// <returns></returns>
-    private async Task<List<LevelConfigurationViewModel>> GetLevelConfigurations(Guid levelId)
+    private async Task<List<LevelConfigurationViewModel>> GetLevelConfigurationsAsync(Guid levelId)
     {
         List<LevelConfigurationViewModel> levelConfigurations = new List<LevelConfigurationViewModel>();
         
@@ -208,11 +237,53 @@ public class MainMenuManager : MonoBehaviour
                     levelConfigurations = JsonConvert.DeserializeObject<List<LevelConfigurationViewModel>>(jsonString);
                 }
 
-                // show loading animation
+                // hide loading animation
                 LoadingObject.SetActive(false);
 
                 return levelConfigurations;
             }
+        }
+        catch (Exception ex)
+        {
+            var message = ex.Message;
+            throw ex;
+        }
+    }
+
+    private async Task<List<Scoreboard>> GetScoresAsync(Guid levelConfigurationId)
+    {
+        List<Scoreboard> scores = new List<Scoreboard>();
+
+        TokenManager tokenManager = new TokenManager();
+        var accessToken = tokenManager.RetrieveToken();
+
+        try
+        {
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+
+                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri($"http://localhost:7071/api/Scoreboard/{levelConfigurationId}"));
+
+                // show loading animation
+                LoadingObject.SetActive(true);
+
+                HttpResponseMessage jsonResponse = await levelConfigurationsTask;
+
+                if (jsonResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = await jsonResponse.Content.ReadAsStringAsync();
+                    var jsonString = responseContent;
+
+                    scores = JsonConvert.DeserializeObject<List<Scoreboard>>(jsonString);
+                }
+
+                // hide loading animation
+                LoadingObject.SetActive(false);
+
+                return scores;
+            }
+
         }
         catch (Exception ex)
         {
@@ -237,19 +308,23 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    // move all these methods to a seperate class probably for api calls
-    private List<Target> GetTargets(Guid levelConfigurationId)
-    {
-        List<Target> targets = new List<Target>();
+    //// move all these methods to a seperate class probably for api calls
+    //private List<Target> GetTargets(Guid levelConfigurationId)
+    //{
+    //    List<Target> targets = new List<Target>();
 
-        return targets;
-    }
+    //    return targets;
+    //}
 
-    private TargetZone GetTargetZone(Guid levelConfigurationId)
-    {
-        TargetZone targetZone = new TargetZone();
+    //private TargetZone GetTargetZone(Guid levelConfigurationId)
+    //{
+    //    TargetZone targetZone = new TargetZone();
 
-        return targetZone;
-    }
+    //    return targetZone;
+    //}
+}
 
+public enum MenuContext {
+    Play = 0,
+    Leadboard = 1
 }

@@ -15,7 +15,7 @@ public class TargetManager : MonoBehaviour
     private int _missCount = 0;
     private int _score = 0;
     private float _targetUptime = 0f;
-    private float _timeLeft = 10.0f;
+    private float _timeLeft = 60.0f;
 
     // fields to update the GUI so user can see time left
     private TextMeshProUGUI _timerDisplay;
