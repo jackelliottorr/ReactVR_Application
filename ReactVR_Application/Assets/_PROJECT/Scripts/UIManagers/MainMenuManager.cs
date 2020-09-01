@@ -14,6 +14,8 @@ using VRUiKits.Utils;
 
 public class MainMenuManager : MonoBehaviour
 {
+    private APIHelper _apiHelper = new APIHelper();
+
     // store found levels so that we can hit back and not have to hit the API again
     private List<Level> _levels = new List<Level>();
     private List<LevelConfigurationViewModel> _levelConfigurationViewModels = new List<LevelConfigurationViewModel>();
@@ -204,6 +206,50 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    
+    private async void PopulateLevelCreationTab()
+    {
+        // get level configurations that user has created
+        List<LevelConfigurationViewModel> levelConfigurations = new List<LevelConfigurationViewModel>();
+
+        TokenManager tokenManager = new TokenManager();
+        var accessToken = tokenManager.RetrieveToken();
+
+        try
+        {
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+                
+                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri(_apiHelper.GetBaseUri(), "/LevelConfiguration/GetLevelConfigurationsByCreatedById"));
+
+                // show loading animation
+                LoadingObject.SetActive(true);
+
+                HttpResponseMessage jsonResponse = await levelConfigurationsTask;
+
+                if (jsonResponse.IsSuccessStatusCode)
+                {
+                    var responseContent = await jsonResponse.Content.ReadAsStringAsync();
+                    var jsonString = responseContent;
+
+                    levelConfigurations = JsonConvert.DeserializeObject<List<LevelConfigurationViewModel>>(jsonString);
+                }
+
+                // hide loading animation
+                LoadingObject.SetActive(false);
+
+                //return levelConfigurations;
+            }
+        }
+        catch (Exception ex)
+        {
+            var message = ex.Message;
+            throw ex;
+        }
+    }
+
+
     /// <summary>
     /// Gets LevelConfigurations from the API, must supply levelId.
     /// </summary>
@@ -249,6 +295,7 @@ public class MainMenuManager : MonoBehaviour
             throw ex;
         }
     }
+
 
     private async Task<List<Scoreboard>> GetScoresAsync(Guid levelConfigurationId)
     {
@@ -307,6 +354,12 @@ public class MainMenuManager : MonoBehaviour
             throw exception;
         }
     }
+
+    
+    
+    
+    
+    
 
     //// move all these methods to a seperate class probably for api calls
     //private List<Target> GetTargets(Guid levelConfigurationId)

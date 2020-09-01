@@ -59,13 +59,14 @@ public class LoginManager : MonoBehaviour
         }
     }
 
+    //var emailAddress = "jackelliottorr@gmail.com";
+    //var password = "password1";
+    //var passwordConfirm = "password1";
     private UserAccountCreateModel BuildLoginModel()
     {
-        //var emailAddress = _inputEmailAddress.text;
-        //var password = _inputPassword.text;
-        var emailAddress = "jackelliottorr@gmail.com";
-        var password = "password1";
-        var passwordConfirm = "password1";
+        var emailAddress = _inputEmailAddress.text;
+        var password = _inputPassword.text;
+
 
         var userAccountCreateModel = new UserAccountCreateModel()
         {
