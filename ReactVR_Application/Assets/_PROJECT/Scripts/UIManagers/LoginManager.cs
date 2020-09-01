@@ -13,7 +13,11 @@ using UnityEngine.UI;
 public class LoginManager : MonoBehaviour
 {
     #region Private Fields
-    
+
+    //private string _baseUrl = "http://reactvrapi.azurewebsites.net/api";
+
+    private APIHelper _apiHelper = new APIHelper();
+
     [SerializeField]
     private InputField _inputEmailAddress;
 
@@ -32,31 +36,32 @@ public class LoginManager : MonoBehaviour
     private void Awake()
     {
         TokenManager tokenManager = new TokenManager();
+        tokenManager.StoreToken("");
         var accessToken = tokenManager.RetrieveToken();
 
-        try
-        {
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                var jsonResponse = httpClient.PostAsync(new Uri("http://localhost:7071/api/UserAccount/ValidateAccessToken"), null).Result;
+        //try
+        //{
+        //    using (var httpClient = new HttpClient())
+        //    {
+        //        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
+        //        var jsonResponse = httpClient.PostAsync(new Uri("http://reactvrapi.azurewebsites.net/api/UserAccount/ValidateAccessToken"), null).Result;
 
-                if (jsonResponse.IsSuccessStatusCode)
-                {
-                    var responseContent = jsonResponse.Content.ReadAsStringAsync();
-                    string updatedAccessToken = responseContent.Result;
+        //        if (jsonResponse.IsSuccessStatusCode)
+        //        {
+        //            var responseContent = jsonResponse.Content.ReadAsStringAsync();
+        //            string updatedAccessToken = responseContent.Result;
 
-                    tokenManager.StoreToken(updatedAccessToken);
+        //            tokenManager.StoreToken(updatedAccessToken);
 
-                    SceneManager.LoadSceneAsync("Main Menu Scene", LoadSceneMode.Single);
-                }
-            }
-        }        
-        catch (Exception ex)
-        {
-            var message = ex.Message;
-            throw ex;
-        }
+        //            // SceneManager.LoadSceneAsync("Main Menu Scene", LoadSceneMode.Single);
+        //        }
+        //    }
+        //}        
+        //catch (Exception ex)
+        //{
+        //    var message = ex.Message;
+        //    throw ex;
+        //}
     }
 
     //var emailAddress = "jackelliottorr@gmail.com";
@@ -64,9 +69,12 @@ public class LoginManager : MonoBehaviour
     //var passwordConfirm = "password1";
     private UserAccountCreateModel BuildLoginModel()
     {
-        var emailAddress = _inputEmailAddress.text;
-        var password = _inputPassword.text;
+        //var emailAddress = _inputEmailAddress.text;
+        //var password = _inputPassword.text;
 
+        var emailAddress = "test@email.com";
+        var password = "password";
+        var passwordConfirm = "password";
 
         var userAccountCreateModel = new UserAccountCreateModel()
         {
@@ -116,7 +124,7 @@ public class LoginManager : MonoBehaviour
     public void Login()
     {
         var userAccountCreateModel = BuildLoginModel();
-        string url = "http://localhost:7071/api/UserAccount/Login";
+        string url = _apiHelper.GetBaseUri() + "/UserAccount/Login";
 
         if (HandleLoginAttempt(userAccountCreateModel, url))
         {
@@ -127,7 +135,7 @@ public class LoginManager : MonoBehaviour
     public void CreateAccount()
     {
         var userAccountCreateModel = BuildLoginModel();
-        string url = "http://localhost:7071/api/UserAccount/CreateUserAccount";
+        string url = _apiHelper.GetBaseUri() + "/UserAccount/CreateUserAccount";
 
         if (HandleLoginAttempt(userAccountCreateModel, url))
         {

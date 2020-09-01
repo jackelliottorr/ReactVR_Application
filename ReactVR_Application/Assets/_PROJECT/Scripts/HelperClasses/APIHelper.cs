@@ -8,7 +8,7 @@ namespace Assets._PROJECT.Scripts.HelperClasses
 {
     public class APIHelper
     {
-        const string _baseUriString = "http://localhost:7071/api";
+        const string _baseUriString = "http://reactvrapi.azurewebsites.net/api/";
         private Uri _baseUri = null;
 
         public Uri GetBaseUri()

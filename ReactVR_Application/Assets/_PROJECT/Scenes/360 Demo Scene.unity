@@ -1847,7 +1847,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-61288
+  m_Name: pb_Mesh28236
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3840,7 +3840,7 @@ MeshCollider:
   m_GameObject: {fileID: 1244361505}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Convex: 0
   m_CookingOptions: 14
@@ -5012,8 +5012,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1244361505}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -3.5, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -3.5691, y: 0, z: 0.000012836}
+  m_LocalScale: {x: 0.95393, y: 1, z: 0.97433}
   m_Children:
   - {fileID: 368813957}
   - {fileID: 140100858}
@@ -10892,7 +10892,8 @@ MonoBehaviour:
   HitDisplay: {fileID: 1441115124}
   MissedDisplay: {fileID: 572661272}
   ScoreDisplay: {fileID: 127014915}
-  MenuScene: {fileID: 102900000, guid: 643cd2b8a8541394ca27c223d968f014, type: 3}
+  MenuScene:
+    m_Handle: 0
 --- !u!1 &1772981511
 GameObject:
   m_ObjectHideFlags: 0

@@ -244,7 +244,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!64 &86156200
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1950,7 +1951,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!136 &183013643
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2071,7 +2073,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400006, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: -5.144
       objectReference: {fileID: 0}
     - target: {fileID: 400006, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2079,7 +2081,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400006, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.592
+      value: 0.432
       objectReference: {fileID: 0}
     - target: {fileID: 400006, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
       propertyPath: m_LocalRotation.x
@@ -2131,7 +2133,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh50318
+  m_Name: pb_Mesh48716
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -3079,7 +3081,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!1 &646840372 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1125068011842588, guid: ce816f2e6abb0504092c23ed9b970dfd,
@@ -3611,7 +3614,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!1 &893501655
 GameObject:
   m_ObjectHideFlags: 0
@@ -4599,7 +4603,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!54 &1428498141
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4892,7 +4897,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!54 &1483237245
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -9948,7 +9954,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!1 &1700817542
 GameObject:
   m_ObjectHideFlags: 0
@@ -10064,7 +10071,8 @@ MonoBehaviour:
   HitDisplay: {fileID: 1441115124}
   MissedDisplay: {fileID: 572661272}
   ScoreDisplay: {fileID: 127014915}
-  MenuScene: {fileID: 102900000, guid: 643cd2b8a8541394ca27c223d968f014, type: 3}
+  MenuScene:
+    m_Handle: 0
 --- !u!1001 &1775837904
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10245,7 +10253,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cb4f1d2f105a694d80bed92b665c23e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SoundEffect: {fileID: 8300000, guid: 62a79e2fecc38e44cbfb3d2c2e61deed, type: 3}
+  HitSoundEffect: {fileID: 0}
+  ActivationSoundEffect: {fileID: 0}
 --- !u!136 &1789224320
 CapsuleCollider:
   m_ObjectHideFlags: 0

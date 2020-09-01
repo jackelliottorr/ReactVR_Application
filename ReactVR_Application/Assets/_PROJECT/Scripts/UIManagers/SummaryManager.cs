@@ -16,6 +16,8 @@ namespace Assets._PROJECT.Scripts.UIManagers
 {
     class SummaryManager : MonoBehaviour
     {
+        private APIHelper _apiHelper = new APIHelper();
+
         private int _score;
 
         private TextMeshProUGUI _hitDisplay;
@@ -58,8 +60,9 @@ namespace Assets._PROJECT.Scripts.UIManagers
 
                 // Build the ScoreboardCreateModel
                 ScoreboardCreateModel createModel = new ScoreboardCreateModel();
-                //createModel.LevelConfigurationId = SessionData.LevelConfigurationViewModel.LevelConfigurationId;
-                createModel.LevelConfigurationId = new Guid("5B6FA5B4-66BE-4137-8558-54C792AAF354");
+                createModel.LevelConfigurationId = SessionData.LevelConfigurationViewModel.LevelConfigurationId;
+                // log the score against the default demo game mode for now
+                //createModel.LevelConfigurationId = new Guid("5B6FA5B4-66BE-4137-8558-54C792AAF354");
                 createModel.Score = _score;
 
                 var jsonString = JsonConvert.SerializeObject(createModel);
@@ -69,7 +72,7 @@ namespace Assets._PROJECT.Scripts.UIManagers
                 using (var httpClient = new HttpClient())
                 {
                     httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
-                    var jsonResponse = httpClient.PostAsync(new Uri("http://localhost:7071/api/Scoreboard/CreateScoreboardEntry"), content).Result;
+                    var jsonResponse = httpClient.PostAsync(new Uri(_apiHelper.GetBaseUri() + "Scoreboard/CreateScoreboardEntry"), content).Result;
 
                     // if score successfully logged, 
                     if (jsonResponse.IsSuccessStatusCode)

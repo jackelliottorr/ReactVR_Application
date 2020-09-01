@@ -182,7 +182,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
 
-                Task<HttpResponseMessage> levelsTask = httpClient.GetAsync(new Uri("http://localhost:7071/api/Level/GetAllLevels"));
+                Task<HttpResponseMessage> levelsTask = httpClient.GetAsync(new Uri(_apiHelper.GetBaseUri() + "Level/GetAllLevels"));
                 LoadingObject.SetActive(true);
                 HttpResponseMessage jsonResponse = await levelsTask;
 
@@ -221,7 +221,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
                 
-                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri(_apiHelper.GetBaseUri(), "/LevelConfiguration/GetLevelConfigurationsByCreatedById"));
+                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri(_apiHelper.GetBaseUri() + "LevelConfiguration/GetLevelConfigurationsByCreatedById"));
 
                 // show loading animation
                 LoadingObject.SetActive(true);
@@ -268,7 +268,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
 
-                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri($"http://localhost:7071/api/LevelConfiguration/{levelId}")); 
+                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri(_apiHelper.GetBaseUri() + $"LevelConfiguration/{levelId}")); 
 
                 // show loading animation
                 LoadingObject.SetActive(true);
@@ -310,7 +310,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
 
-                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri($"http://localhost:7071/api/Scoreboard/{levelConfigurationId}"));
+                Task<HttpResponseMessage> levelConfigurationsTask = httpClient.GetAsync(new Uri(_apiHelper.GetBaseUri() + "Scoreboard/{levelConfigurationId}"));
 
                 // show loading animation
                 LoadingObject.SetActive(true);
@@ -347,7 +347,16 @@ public class MainMenuManager : MonoBehaviour
             SessionData.LevelConfigurationViewModel = levelConfigToLoad;
 
             // somehow pass the configuration into the next scene?
-            SceneManager.LoadSceneAsync("Standard Game Mode", LoadSceneMode.Single);
+            // for now, just run the default standard game mode
+
+            if (levelConfigToLoad.Name == "Test Level")
+            {
+                SceneManager.LoadSceneAsync("Demo Scene", LoadSceneMode.Single);
+            }
+            else if (levelConfigToLoad.Name == "360 Test Level")
+            {
+                SceneManager.LoadSceneAsync("360 Demo Scene", LoadSceneMode.Single);
+            }
         }
         catch (Exception exception)
         {
@@ -355,7 +364,7 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
-    
+ 
     
     
     
